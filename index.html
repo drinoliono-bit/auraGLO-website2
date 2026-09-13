@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraTech — Next-Gen Innovations</title>
+    <title>GLOBALX AI — Next-Gen Intelligence Solutions</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CSS Reset & Variables --- */
         :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --accent: #38bdf8;
-            --accent-hover: #0284c7;
+            --bg-main: #060913;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --border-glow: rgba(56, 189, 248, 0.25);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #38bdf8;
+            --accent-purple: #818cf8;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.08);
             --radius: 16px;
-            --transition: all 0.3s ease;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Light Mode Overrides */
+        body.light-theme {
+            --bg-main: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --border-glow: rgba(2, 132, 199, 0.3);
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
         }
 
         * {
@@ -30,12 +40,14 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
+            background-color: var(--bg-main);
             color: var(--text-main);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
         }
 
         /* --- Header / Navigation --- */
@@ -43,53 +55,95 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 2rem;
             max-width: 1200px;
             margin: 0 auto;
             width: 100%;
         }
 
-        .logo {
-            font-size: 1.5rem;
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-mark {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 1.2rem;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .brand-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             color: var(--text-main);
         }
 
-        .logo span {
-            color: var(--accent);
+        .brand-name span {
+            color: var(--accent-cyan);
         }
 
-        .contact-btn {
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
             background: transparent;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-subtle);
             color: var(--text-main);
-            padding: 0.5rem 1.2rem;
+            padding: 0.5rem 0.8rem;
             border-radius: 20px;
             cursor: pointer;
-            font-weight: 500;
+            font-size: 0.9rem;
             transition: var(--transition);
         }
 
-        .contact-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+        .theme-toggle:hover {
+            border-color: var(--accent-cyan);
         }
 
         /* --- Hero Section --- */
         .hero {
             text-align: center;
-            padding: 4rem 1.5rem 3rem;
-            max-width: 800px;
+            padding: 5rem 1.5rem 3rem;
+            max-width: 850px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--border-glow);
+            border-radius: 30px;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
         }
 
         .hero h1 {
-            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5.5vw, 4rem);
             font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff 0%, var(--text-muted) 100%);
+            line-height: 1.15;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--accent-cyan) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -116,27 +170,28 @@
 
         /* --- Product Card --- */
         .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             transition: var(--transition);
-            position: relative;
         }
 
         .card:hover {
             transform: translateY(-8px);
-            border-color: rgba(56, 189, 248, 0.3);
-            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
+            border-color: var(--border-glow);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
         }
 
         .card-img-wrapper {
             width: 100%;
             height: 220px;
             overflow: hidden;
-            background-color: #020617;
+            background-color: #000;
+            position: relative;
         }
 
         .card-img-wrapper img {
@@ -144,21 +199,24 @@
             height: 100%;
             object-fit: cover;
             transition: var(--transition);
+            opacity: 0.9;
         }
 
         .card:hover .card-img-wrapper img {
-            transform: scale(1.05);
+            transform: scale(1.06);
+            opacity: 1;
         }
 
         .card-content {
-            padding: 1.5rem;
+            padding: 1.75rem;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
         }
 
         .card-title {
-            font-size: 1.25rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
@@ -176,20 +234,21 @@
             align-items: center;
             margin-top: auto;
             padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-subtle);
         }
 
         .price {
-            font-size: 1.3rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--text-main);
         }
 
         .btn-learn {
-            background-color: var(--accent);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             color: #0f172a;
             border: none;
-            padding: 0.6rem 1.2rem;
+            padding: 0.65rem 1.3rem;
             border-radius: 8px;
             font-weight: 600;
             font-size: 0.9rem;
@@ -198,34 +257,140 @@
         }
 
         .btn-learn:hover {
-            background-color: var(--accent-hover);
-            color: #ffffff;
+            opacity: 0.9;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
         }
 
         /* --- Footer --- */
         footer {
             margin-top: auto;
             text-align: center;
-            padding: 2rem;
-            border-top: 1px solid var(--border-color);
+            padding: 2.5rem 1.5rem;
+            border-top: 1px solid var(--border-subtle);
             color: var(--text-muted);
             font-size: 0.85rem;
         }
 
-        /* --- Toast Notification --- */
+        /* --- Product Modal Popup --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(6, 9, 19, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            transform: scale(0.9);
+            transition: var(--transition);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+        }
+
+        .modal-body {
+            padding: 1.75rem;
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .modal-price {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* --- Notification Toast --- */
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--accent);
-            color: #0f172a;
+            bottom: 25px;
+            right: 25px;
+            background: var(--text-main);
+            color: var(--bg-main);
             padding: 0.8rem 1.5rem;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 600;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
         }
 
         .toast.show {
@@ -236,63 +401,69 @@
 </head>
 <body>
 
-    <!-- Header Navigation -->
+    <!-- Navigation Header -->
     <header>
-        <div class="logo">Aura<span>Tech</span></div>
-        <button class="contact-btn" onclick="showToast('Contact feature coming soon!')">Contact Us</button>
+        <a href="#" class="brand-container">
+            <div class="logo-mark">X</div>
+            <div class="brand-name">GLOBAL<span>X</span> AI</div>
+        </a>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">☀️ Light</button>
+        </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero Banner -->
     <section class="hero">
-        <h1>Engineered for the Digital Era</h1>
-        <p>Discover our minimalist line of intelligent devices designed to seamless integrate into your work, lifestyle, and environment.</p>
+        <span class="hero-badge">Autonomous Ecosystem 2026</span>
+        <h1>Autonomous Intelligence for Global Scale</h1>
+        <p>Empowering enterprise infrastructure with next-generation neural architecture, predictive edge units, and real-time vision analytics.</p>
     </section>
 
-    <!-- Product Showcase Section -->
+    <!-- Product Showcase -->
     <main class="products-section">
         <div class="grid">
             
-            <!-- Card 1 -->
+            <!-- Product 1 -->
             <article class="card">
                 <div class="card-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80" alt="Aura Pulse Headphones">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="GX Neural Core">
                 </div>
                 <div class="card-content">
-                    <h2 class="card-title">Aura Pulse Headphones</h2>
-                    <p class="card-desc">Studio-grade spatial audio paired with adaptive active noise cancellation and a lightweight 40-hour battery frame.</p>
+                    <h2 class="card-title">GX-1 Neural Node</h2>
+                    <p class="card-desc">Compact edge-computing server featuring custom silicon optimized for real-time LLM execution and sub-millisecond inference.</p>
                     <div class="card-footer">
-                        <span class="price">$299</span>
-                        <button class="btn-learn" onclick="showToast('Loading Aura Pulse details...')">Learn More</button>
+                        <span class="price">$1,299</span>
+                        <button class="btn-learn" onclick="openModal('GX-1 Neural Node', 'Compact edge-computing server featuring custom silicon optimized for real-time LLM execution and sub-millisecond inference.', '$1,299', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80')">Learn More</button>
                     </div>
                 </div>
             </article>
 
-            <!-- Card 2 -->
+            <!-- Product 2 -->
             <article class="card">
                 <div class="card-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80" alt="Aura Time Smartwatch">
+                    <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=600&q=80" alt="GX Vision Module">
                 </div>
                 <div class="card-content">
-                    <h2 class="card-title">Aura Horizon Watch</h2>
-                    <p class="card-desc">Next-generation health telemetry, titanium chassis, and an ultra-bright AMOLED display designed for any adventure.</p>
+                    <h2 class="card-title">GX Vision Cam Pro</h2>
+                    <p class="card-desc">Autonomous optical sensor with integrated spatial AI for industrial automation, boundary scanning, and predictive safety tracking.</p>
                     <div class="card-footer">
-                        <span class="price">$349</span>
-                        <button class="btn-learn" onclick="showToast('Loading Aura Horizon details...')">Learn More</button>
+                        <span class="price">$849</span>
+                        <button class="btn-learn" onclick="openModal('GX Vision Cam Pro', 'Autonomous optical sensor with integrated spatial AI for industrial automation, boundary scanning, and predictive safety tracking.', '$849', 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=600&q=80')">Learn More</button>
                     </div>
                 </div>
             </article>
 
-            <!-- Card 3 -->
+            <!-- Product 3 -->
             <article class="card">
                 <div class="card-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=600&q=80" alt="Aura Sound Speaker">
+                    <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=600&q=80" alt="GX Quantum Hub">
                 </div>
                 <div class="card-content">
-                    <h2 class="card-title">Aura Sphere Speaker</h2>
-                    <p class="card-desc">360-degree room-filling acoustic architecture with integrated voice assistance and multi-room sync capability.</p>
+                    <h2 class="card-title">GX Quantum Hub</h2>
+                    <p class="card-desc">Unified control center establishing secure mesh networks across all your deployed GlobalX AI devices with end-to-end encryption.</p>
                     <div class="card-footer">
-                        <span class="price">$199</span>
-                        <button class="btn-learn" onclick="showToast('Loading Aura Sphere details...')">Learn More</button>
+                        <span class="price">$2,199</span>
+                        <button class="btn-learn" onclick="openModal('GX Quantum Hub', 'Unified control center establishing secure mesh networks across all your deployed GlobalX AI devices with end-to-end encryption.', '$2,199', 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=600&q=80')">Learn More</button>
                     </div>
                 </div>
             </article>
@@ -302,13 +473,52 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2026 AuraTech Inc. All rights reserved.</p>
+        <p>&copy; 2026 GLOBALX AI Technologies Corp. All rights reserved.</p>
     </footer>
 
-    <!-- Interactive Toast Notification -->
-    <div id="toast" class="toast">Action triggered!</div>
+    <!-- Product Details Modal Popup -->
+    <div id="productModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <img id="modalImg" class="modal-img" src="" alt="Product Image">
+            <div class="modal-body">
+                <h2 id="modalTitle" class="modal-title"></h2>
+                <p id="modalDesc" class="modal-desc"></p>
+                <div class="modal-footer">
+                    <span id="modalPrice" class="modal-price"></span>
+                    <button class="btn-learn" onclick="closeModal(); showToast('Request submitted successfully!')">Order Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Toast -->
+    <div id="toast" class="toast">Action initialized</div>
 
     <script>
+        // Open Product Modal
+        function openModal(title, desc, price, imgSrc) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDesc').textContent = desc;
+            document.getElementById('modalPrice').textContent = price;
+            document.getElementById('modalImg').src = imgSrc;
+            document.getElementById('modalImg').alt = title;
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        // Close Product Modal
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        // Close Modal when clicking outside the box
+        function closeModalOnOverlay(event) {
+            if (event.target.id === 'productModal') {
+                closeModal();
+            }
+        }
+
+        // Interactive Toast Function
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -317,6 +527,20 @@
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
+        }
+
+        // Light/Dark Theme Switcher
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeToggleBtn');
+            
+            body.classList.toggle('light-theme');
+            
+            if (body.classList.contains('light-theme')) {
+                btn.textContent = '🌙 Dark';
+            } else {
+                btn.textContent = '☀️ Light';
+            }
         }
     </script>
 </body>
