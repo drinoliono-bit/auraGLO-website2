@@ -87,7 +87,7 @@
         signInWithPopup(auth, provider)
           .catch((error) => {
             console.error("Authentication error:", error);
-            showNotification("Sign-in failed: " + error.message, "error");
+            showNotification("Sign-in error: " + error.message, "error");
           });
       };
 
