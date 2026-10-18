@@ -536,5 +536,248 @@
       showNotification("Report exported successfully.");
     }
   </script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWqKOfzvdnkMUXB7gO7ju9aEoe1lvsv-0",
+      authDomain: "invoicematchy.com",
+      projectId: "invoice-payment-59887",
+      storageBucket: "invoice-payment-59887.firebasestorage.app",
+      messagingSenderId: "742158300569",
+      appId: "1:742158300569:web:1ce4604e996780340c0f08",
+      measurementId: "G-5YZGMZBMFJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    let rawInvoices = [];
+    let rawBankTxns = [];
+    let reconciliationResults = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const landingPage = document.getElementById('landing-page');
+      const appDashboard = document.getElementById('app-dashboard');
+      const launchBtn = document.getElementById('launch-workspace-btn');
+      const googleBtn = document.getElementById('google-signin-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+      const userDisplay = document.getElementById('user-display');
+
+      const handleSignIn = (provider) => {
+        signInWithRedirect(auth, provider).catch((error) => {
+          console.error("Authentication error:", error);
+        });
+      };
+
+      if (launchBtn) launchBtn.addEventListener('click', () => handleSignIn(googleProvider));
+      if (googleBtn) googleBtn.addEventListener('click', () => handleSignIn(googleProvider));
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          signOut(auth).catch((error) => console.error("Sign-out error:", error));
+        });
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          if (landingPage) landingPage.classList.add('hidden');
+          if (appDashboard) appDashboard.classList.remove('hidden');
+          if (userDisplay) userDisplay.textContent = user.displayName || user.email;
+        } else {
+          if (landingPage) landingPage.classList.remove('hidden');
+          if (appDashboard) appDashboard.classList.add('hidden');
+        }
+      });
+    });
+
+    window.showNotification = function(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      
+      const toast = document.createElement('div');
+      toast.className = `px-4 py-3 rounded-xl text-sm font-medium shadow-xl border flex items-center space-x-2 transition-all transform translate-y-2 opacity-0 ${
+        type === 'error'
+          ? 'bg-red-100 dark:bg-red-950 border-red-300 dark:border-red-800 text-red-800 dark:text-red-200'
+          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100'
+      }`;
+
+      toast.innerHTML = `<i class="fa-solid ${
+        type === 'error' ? 'fa-circle-exclamation text-red-500' : 'fa-circle-check text-emerald-500'
+      }"></i><span>${message}</span>`;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 50);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    window.handleInvoiceUpload = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById('invoice-file-name').textContent = file.name;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        parseCSV(e.target.result, (data) => {
+          rawInvoices = data;
+          document.getElementById('stat-total-invoices').textContent = rawInvoices.length;
+          showNotification(`Loaded ${rawInvoices.length} invoices successfully.`);
+        });
+      };
+      reader.readAsText(file);
+    }
+
+    window.handleBankUpload = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById('bank-file-name').textContent = file.name;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        parseCSV(e.target.result, (data) => {
+          rawBankTxns = data;
+          document.getElementById('stat-total-transactions').textContent = rawBankTxns.length;
+          showNotification(`Loaded ${rawBankTxns.length} bank transactions successfully.`);
+        });
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCSV(text, callback) {
+      const lines = text.split('\n').filter(l => l.trim() !== '');
+      if (lines.length === 0) {
+        callback([]);
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+      const result = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const currentLine = lines[i].split(',');
+        if (currentLine.length === headers.length) {
+          const obj = {};
+          for (let j = 0; j < headers.length; j++) {
+            obj[headers[j]] = currentLine[j].trim().replace(/^["']|["']$/g, '');
+          }
+          result.push(obj);
+        }
+      }
+      callback(result);
+    }
+
+    window.runFuzzyMatching = function() {
+      if (rawInvoices.length === 0 || rawBankTxns.length === 0) {
+        showNotification("Please upload both invoice and bank statement CSV files first.", "error");
+        return;
+      }
+
+      reconciliationResults = [];
+      let matchedCount = 0;
+
+      rawBankTxns.forEach((txn, idx) => {
+        const txnAmount = parseFloat(txn.Amount || txn.amount || 0);
+        const txnDesc = (txn.Description || txn.description || "").toLowerCase();
+
+        let bestMatch = null;
+        let confidence = "Low";
+        let status = "Unmatched";
+
+        for (let inv of rawInvoices) {
+          const invAmount = parseFloat(inv.Amount || inv.amount || 0);
+          const invRef = (inv.InvoiceNumber || inv.invoice_number || inv.Reference || "").toLowerCase();
+
+          if (invAmount === txnAmount || (invRef && txnDesc.includes(invRef))) {
+            bestMatch = inv;
+            confidence = invAmount === txnAmount ? "High (Exact Amount)" : "Medium (Reference Match)";
+            status = "Reconciled";
+            matchedCount++;
+            break;
+          }
+        }
+
+        reconciliationResults.push({
+          id: idx + 1,
+          ref: txnDesc || `TXN-${idx + 1}`,
+          amount: txnAmount,
+          matchedInvoice: bestMatch ? (bestMatch.InvoiceNumber || bestMatch.Reference || "INV-MATCHED") : "None",
+          confidence: confidence,
+          status: status
+        });
+      });
+
+      renderResults();
+      const matchRate = Math.round((matchedCount / rawBankTxns.length) * 100);
+      document.getElementById('stat-match-rate').textContent = `${matchRate}%`;
+      showNotification("Intelligent fuzzy matching completed successfully!");
+    }
+
+    function renderResults() {
+      const tbody = document.getElementById('matching-results-body');
+      if (!tbody) return;
+
+      if (reconciliationResults.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="px-6 py-8 text-center text-slate-400">
+              No matching results found.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = reconciliationResults.map(r => `
+        <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-all">
+          <td class="px-6 py-4 font-medium">${r.ref}</td>
+          <td class="px-6 py-4 text-slate-600 dark:text-slate-300">$${r.amount.toFixed(2)}</td>
+          <td class="px-6 py-4 text-brand-600 dark:text-brand-400 font-mono">${r.matchedInvoice}</td>
+          <td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-xs">${r.confidence}</td>
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${
+              r.status === 'Reconciled'
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+            }">
+              ${r.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.exportResults = function() {
+      if (reconciliationResults.length === 0) {
+        showNotification("No results to export.", "error");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Transaction,Amount,MatchedInvoice,Confidence,Status\n";
+      reconciliationResults.forEach(r => {
+        csvContent += `"${r.ref}",${r.amount},"${r.matchedInvoice}","${r.confidence}","${r.status}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "reconciliation_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showNotification("Report exported successfully.");
+    }
+  </script>
 </body>
 </html>
